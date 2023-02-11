@@ -1,5 +1,5 @@
-export type CreateProductDTO = {
+export class CreateProductDTO {
   name: string;
   price: number;
   description: string;
-};
+}
