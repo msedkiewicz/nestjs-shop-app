@@ -1,17 +1,10 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Delete,
-  Post,
-  Body,
-  Put,
-  NotFoundException,
-} from '@nestjs/common';
-import { OrdersService } from './orders.service';
-import { ParseUUIDPipe } from '@nestjs/common';
-import { CreateOrderDTO } from './dtos/create-order.dto';
 import { UpdateOrderDTO } from './dtos/update-order.dto';
+import { ParseUUIDPipe } from '@nestjs/common/pipes';
+import { Controller, Get, Param } from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { NotFoundException } from '@nestjs/common/exceptions';
+import { Body, Delete, Post, Put } from '@nestjs/common/decorators';
+import { CreateOrderDTO } from './dtos/create-order.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -38,9 +31,10 @@ export class OrdersController {
   }
 
   @Post('/')
-  create(@Body() orderData: CreateOrderDTO) {
+  public create(@Body() orderData: CreateOrderDTO) {
     return this.ordersService.create(orderData);
   }
+
   @Put('/:id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
