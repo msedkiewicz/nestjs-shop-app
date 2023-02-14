@@ -1,31 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { db, Order } from './../db';
 import { v4 as uuidv4 } from 'uuid';
+import { PrismaOrderService } from 'src/shared/orders/prisma.order';
 
 @Injectable()
 export class OrdersService {
-  public getAll(): Order[] {
-    return db.orders;
+  constructor(private prismaOrderService: PrismaOrderService) {}
+  public getAll(): Promise<Order[]> {
+    return this.prismaOrderService.order.findMany();
   }
 
-  public getById(id: Order['id']): Order | null {
-    return db.orders.find((p) => p.id === id);
+  public getById(id: Order['id']): Promise<Order | null> {
+    return this.prismaOrderService.order.findUnique({
+      where: { id },
+    });
   }
-  public deleteById(id: Order['id']): void {
-    db.orders = db.orders.filter((p) => p.id !== id);
+  public deleteById(id: Order['id']): Promise<Order> {
+    return this.prismaOrderService.order.delete({
+      where: { id },
+    });
   }
 
-  public create(orderData: Omit<Order, 'id'>): Order {
-    const newOrder = { ...orderData, id: uuidv4() };
-    db.orders.push(newOrder);
-    return newOrder;
+  public create(
+    orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Order> {
+    return this.prismaOrderService.order.create({
+      data: orderData,
+    });
   }
-  public updateById(id: Order['id'], orderData: Omit<Order, 'id'>): void {
-    db.orders = db.orders.map((p) => {
-      if (p.id === id) {
-        return { ...p, ...orderData };
-      }
-      return p;
+  public updateById(
+    id: Order['id'],
+    orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Order> {
+    return this.prismaOrderService.order.update({
+      where: { id },
+      data: orderData,
     });
   }
 }
