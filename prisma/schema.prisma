@@ -38,5 +38,5 @@ model Client {
   name    String
   address String
 
-  order Order[]
+  orders Order[]
 }
